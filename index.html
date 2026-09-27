@@ -191,7 +191,6 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        /* Progreso de Jefes */
         .boss-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -289,7 +288,7 @@
             <div class="boss-section">
                 <h3 class="section-title">Progreso del Clan (Jefes)</h3>
                 <div class="boss-grid">
-                    <!-- Se carga dinámicamente desde bosses.json -->
+                    <!-- Se carga dinámicamente -->
                 </div>
             </div>
 
@@ -305,7 +304,7 @@
         document.getElementById('server-ip').textContent = SERVER_ADDRESS;
         document.getElementById('steam-connect').href = `steam://connect/${SERVER_ADDRESS}`;
 
-        // Cargar el estado de los jefes desde el archivo bosses.json
+        // Cargar el estado de los jefes
         async function loadBossProgress() {
             try {
                 const response = await fetch('bosses.json');
@@ -336,22 +335,22 @@
             }
         }
 
-        // Consultar estado online y jugadores del servidor de Valheim
+        // Consultar estado online y jugadores desde el archivo server_status.json local
         async function checkServerStatus() {
             try {
-                const queryResponse = await fetch(`https://gamestatus.info/api/v1/query?host=${SERVER_HOST}&port=${SERVER_PORT}&game=valheim`);
-                const data = await queryResponse.json();
+                const response = await fetch('server_status.json');
+                const data = await response.json();
 
                 if (data && data.online) {
                     document.getElementById('server-badge').className = "badge online";
                     document.getElementById('status-text').textContent = "Online";
-                    document.getElementById('player-count').textContent = `${data.players.online} / ${data.players.max || 10}`;
+                    document.getElementById('player-count').textContent = `${data.players} / ${data.max_players || 10}`;
 
                     const playersList = document.getElementById('players-list');
-                    if (data.players.list && data.players.list.length > 0) {
-                        playersList.innerHTML = data.players.list.map(player => `
+                    if (data.player_list && data.player_list.length > 0) {
+                        playersList.innerHTML = data.player_list.map(playerName => `
                             <li class="player-item">
-                                <span>🛡️ ${player.name}</span>
+                                <span>🛡️ ${playerName}</span>
                                 <span style="color: var(--online-color); font-size: 0.85rem;">Conectado</span>
                             </li>
                         `).join('');
