@@ -260,7 +260,7 @@
             <div class="status-header">
                 <span class="server-title">Valheim Dedicated Server</span>
                 <div id="server-badge" class="badge online">
-                    <span class="dot"></span> <span id="status-text">Online</span>
+                    <span class="dot"></span> <span id="status-text">Comprobando...</span>
                 </div>
             </div>
 
@@ -282,7 +282,7 @@
             <div class="players-section">
                 <h3 class="section-title">Guerreros en Línea</h3>
                 <ul id="players-list" class="player-list">
-                    <li class="no-players">Servidor activo. ¡Entra a conquistar Kasiheim!</li>
+                    <li class="no-players">Cargando estado del servidor...</li>
                 </ul>
             </div>
 
@@ -336,8 +336,45 @@
             }
         }
 
-        // Ejecutar al cargar
+        // Consultar estado online y jugadores del servidor de Valheim
+        async function checkServerStatus() {
+            try {
+                const queryResponse = await fetch(`https://gamestatus.info/api/v1/query?host=${SERVER_HOST}&port=${SERVER_PORT}&game=valheim`);
+                const data = await queryResponse.json();
+
+                if (data && data.online) {
+                    document.getElementById('server-badge').className = "badge online";
+                    document.getElementById('status-text').textContent = "Online";
+                    document.getElementById('player-count').textContent = `${data.players.online} / ${data.players.max || 10}`;
+
+                    const playersList = document.getElementById('players-list');
+                    if (data.players.list && data.players.list.length > 0) {
+                        playersList.innerHTML = data.players.list.map(player => `
+                            <li class="player-item">
+                                <span>🛡️ ${player.name}</span>
+                                <span style="color: var(--online-color); font-size: 0.85rem;">Conectado</span>
+                            </li>
+                        `).join('');
+                    } else {
+                        playersList.innerHTML = `<li class="no-players">Servidor activo, pero no hay guerreros conectados ahora mismo.</li>`;
+                    }
+                } else {
+                    throw new Error("Offline");
+                }
+            } catch (error) {
+                document.getElementById('server-badge').className = "badge offline";
+                document.getElementById('status-text').textContent = "Offline";
+                document.getElementById('player-count').textContent = "0 / 10";
+                document.getElementById('players-list').innerHTML = `<li class="no-players" style="color: var(--offline-color);">El servidor de Kasiheim está apagado o hibernando.</li>`;
+            }
+        }
+
+        // Ejecutar al cargar la página
         loadBossProgress();
+        checkServerStatus();
+
+        // Actualizar estado cada 60 segundos automáticamente
+        setInterval(checkServerStatus, 60000);
     </script>
 </body>
 </html>
