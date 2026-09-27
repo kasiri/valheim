@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasiheim - Panel de Servidor Valheim</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(18, 24, 38, 0.9);
+            --accent-color: #d97706;
+            --accent-hover: #b45309;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --online-color: #10b981;
+            --offline-color: #ef4444;
+            --border-color: rgba(217, 119, 6, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2.5rem 1rem;
+            background-image: linear-gradient(rgba(11, 15, 25, 0.85), rgba(11, 15, 25, 0.95)), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            margin-bottom: 1.5rem;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .server-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge.online {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--online-color);
+            border: 1px solid var(--online-color);
+        }
+
+        .badge.offline {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var(--offline-color);
+            border: 1px solid var(--offline-color);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .info-item label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .info-item span {
+            font-size: 0.95rem;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            border-left: 3px solid var(--accent-color);
+            padding-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .player-list {
+            list-style: none;
+            max-height: 220px;
+            overflow-y: auto;
+            margin-bottom: 2rem;
+        }
+
+        .player-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .no-players {
+            color: var(--text-muted);
+            font-style: italic;
+            text-align: center;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* Progreso de Jefes */
+        .boss-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .boss-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .boss-card.defeated {
+            border-color: var(--online-color);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .boss-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .boss-status {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .boss-card.defeated .boss-status {
+            color: var(--online-color);
+        }
+
+        .connect-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .connect-btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Kasiheim</h1>
+            <p>Servidor Dedicado Valheim - Clan & Supervivencia</p>
+        </header>
+
+        <div class="card">
+            <div class="status-header">
+                <span class="server-title">Valheim Dedicated Server</span>
+                <div id="server-badge" class="badge online">
+                    <span class="dot"></span> <span id="status-text">Online</span>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Dirección del Servidor</label>
+                    <span id="server-ip">kasiriserver.servegame.com:2456</span>
+                </div>
+                <div class="info-item">
+                    <label>Jugadores</label>
+                    <span id="player-count">0 / 10</span>
+                </div>
+                <div class="info-item">
+                    <label>Versión</label>
+                    <span id="server-version">Valheim Latest</span>
+                </div>
+            </div>
+
+            <div class="players-section">
+                <h3 class="section-title">Guerreros en Línea</h3>
+                <ul id="players-list" class="player-list">
+                    <li class="no-players">Servidor activo. ¡Entra a conquistar Kasiheim!</li>
+                </ul>
+            </div>
+
+            <div class="boss-section">
+                <h3 class="section-title">Progreso del Clan (Jefes)</h3>
+                <div class="boss-grid">
+                    <!-- Se carga dinámicamente desde bosses.json -->
+                </div>
+            </div>
+
+            <a id="steam-connect" href="steam://connect/kasiriserver.servegame.com:2456" class="connect-btn">Unirse a Kasiheim</a>
+        </div>
+    </div>
+
+    <script>
+        const SERVER_HOST = "kasiriserver.servegame.com";
+        const SERVER_PORT = 2456;
+        const SERVER_ADDRESS = `${SERVER_HOST}:${SERVER_PORT}`;
+        
+        document.getElementById('server-ip').textContent = SERVER_ADDRESS;
+        document.getElementById('steam-connect').href = `steam://connect/${SERVER_ADDRESS}`;
+
+        // Cargar el estado de los jefes desde el archivo bosses.json
+        async function loadBossProgress() {
+            try {
+                const response = await fetch('bosses.json');
+                const bosses = await response.json();
+
+                const bossData = [
+                    { id: 'eikthyr', name: 'Eikthyr' },
+                    { id: 'el_sabio', name: 'El Sabio' },
+                    { id: 'bonemass', name: 'Bonemass' },
+                    { id: 'moder', name: 'Moder' },
+                    { id: 'yagluth', name: 'Yagluth' },
+                    { id: 'la_reina', name: 'La Reina' }
+                ];
+
+                const bossGrid = document.querySelector('.boss-grid');
+                bossGrid.innerHTML = bossData.map(boss => {
+                    const isDefeated = bosses[boss.id];
+                    return `
+                        <div class="boss-card ${isDefeated ? 'defeated' : ''}">
+                            <div class="boss-name">${boss.name}</div>
+                            <div class="boss-status">${isDefeated ? '✓ Derrotado' : 'Pendiente'}</div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error("No se pudo cargar el progreso de los jefes", error);
+            }
+        }
+
+        // Ejecutar al cargar
+        loadBossProgress();
+    </script>
+</body>
+</html>
