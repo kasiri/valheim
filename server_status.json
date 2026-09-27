@@ -1,6 +1,9 @@
 {
     "online": true,
-    "players_online": 1,
+    "name": "Kasiriheim",
+    "map": "Kasiriheim",
+    "players": 1,
     "max_players": 10,
-    "players": []
+    "player_list": [],
+    "last_updated": "2026-09-27 20:26:31"
 }
