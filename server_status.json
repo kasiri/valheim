@@ -1,9 +1,9 @@
 {
     "online": true,
-    "name": "Kasiriheim",
-    "map": "Kasiriheim",
-    "players": 1,
+    "name": "Kasiheim Dedicated Server",
+    "map": "Valheim",
+    "players": 0,
     "max_players": 10,
     "player_list": [],
-    "last_updated": "2026-09-27 20:45:01"
+    "last_updated": "2026-09-27 20:47:56"
 }
