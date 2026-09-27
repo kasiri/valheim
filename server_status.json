@@ -2,10 +2,8 @@
     "online": true,
     "name": "Kasiheim Dedicated Server",
     "map": "Valheim",
-    "players": 1,
+    "players": 0,
     "max_players": 10,
-    "player_list": [
-        "Vyktor"
-    ],
-    "last_updated": "2026-09-27 21:00:01"
+    "player_list": [],
+    "last_updated": "2026-09-27 21:00:13"
 }
