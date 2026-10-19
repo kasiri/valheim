@@ -21,7 +21,9 @@ La web consulta por defecto `https://kasiheim.site`. Para usar otro backend en d
 
 ## Estado del servidor
 
-La API comprueba el proceso Valheim que utiliza `VALHEIM_PORT` y consulta el protocolo de servidor A2S por UDP. El ping mostrado es el RTT de la consulta desde el VPS al servidor; no es la latencia individual de cada jugador. La lista de nombres depende de que el servidor responda a `A2S_PLAYER`; si no lo hace, la interfaz informa que no están disponibles en lugar de inventarlos. Se descartan los metadatos genéricos que AMP informa por defecto (`PoweredByAMP`, `My Valheim Server - Powered by AMP` y `1.0.0.0`) para no presentarlos como datos reales.
+La API comprueba el proceso Valheim que utiliza `VALHEIM_PORT` y consulta el protocolo de servidor A2S por UDP. El ping mostrado es el RTT de la consulta desde el VPS al servidor; no es la latencia individual de cada jugador. Para los nombres, primero usa los datos A2S si son válidos y, si el servidor no los da, lee la instantánea reciente que genera el plugin BepInEx de Kasiheim. Rechaza listas obsoletas o que no coincidan con el contador de conexiones. Se descartan los metadatos genéricos que AMP informa por defecto (`PoweredByAMP`, `My Valheim Server - Powered by AMP` y `1.0.0.0`) para no presentarlos como datos reales.
+
+La página de normas, la lista de plugins del servidor, las preguntas frecuentes y los enlaces públicos de Kasiri se mantienen en `src/data/content.js` y en los componentes de `src/pages/`.
 
 La configuración por defecto consulta el proceso del puerto `2458` y hace A2S en `127.0.0.1:2459`. Si AMP usa otro puerto de consulta, configura `VALHEIM_QUERY_PORT`. El estado se actualiza cada 10 segundos.
 

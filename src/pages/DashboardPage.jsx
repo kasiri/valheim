@@ -57,7 +57,7 @@ export default function DashboardPage({ status, statusError, isLoading }) {
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-4">
           <div>
             <h2 className="font-bold text-lg text-slate-100 uppercase tracking-wide">Jugadores conectados</h2>
-            <p className="text-xs text-slate-400 mt-1">Nombres obtenidos de la consulta del servidor.</p>
+            <p className="text-xs text-slate-400 mt-1">Nombres publicados por el plugin de estado de Kasiheim.</p>
           </div>
           {status?.updated_at && (
             <span className="flex items-center gap-1.5 text-xs text-slate-400">

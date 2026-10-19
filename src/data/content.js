@@ -9,33 +9,49 @@ export const BOSSES = [
 ];
 
 export const MODS = [
-  { name: 'BepInEx Pack Valheim', author: 'denikson', category: 'Core Required', desc: 'Framework esencial para la inyección de código y ejecución de mods en Valheim.', required: true },
-  { name: 'Craft From Containers', author: 'aedenthorn', category: 'Calidad de Vida', desc: 'Permite construir, craftear y alimentar estructuras tomando recursos directamente de cofres cercanos.', required: false },
-  { name: 'Quick Stack Store', author: 'GoldenJude', category: 'Inventario', desc: 'Guarda automáticamente materiales de tu inventario en cofres cercanos con un solo clic.', required: false },
-  { name: 'Valheim Plus Updated', author: 'Grantapher', category: 'Ajustes del Servidor', desc: 'Mejora de rendimiento, modificadores de stamina y balance general del servidor.', required: true },
-  { name: 'Equipment and Quick Slots', author: 'RandyKnapp', category: 'UI / Inventario', desc: 'Añade casillas dedicadas para armaduras, pociones y objetos de acceso rápido.', required: false }
+  { name: 'BetterSleepBruh', category: 'Calidad de vida' },
+  { name: 'CraftFromContainers', category: 'Fabricación' },
+  { name: 'ExpandWorldSize', category: 'Mundo' },
+  { name: 'LongerDays', category: 'Mundo' },
+  { name: 'ProtectiveWards', category: 'Construcción' },
+  { name: 'QuickStackStore', category: 'Inventario' },
+  { name: 'ServerDevcommands', category: 'Administración' },
+  { name: 'UpgradeWorld', category: 'Administración del mundo' },
+  { name: 'VentureValheim.Progression', category: 'Progresión' },
+  { name: 'KasiheimPlayers', category: 'Estado web', serverOnly: true }
 ];
 
 export const RULES = [
-  { title: '1. Respeto y Convivencia', text: 'Mantener un trato cordial en el chat global y en Discord. Prohibido el acoso, la discriminación o la toxicidad.' },
-  { title: '2. Política de PvP y Combate', text: 'El PvP está desactivado en la Base Central. Para duelos o guerras acordadas entre clanes, ambos bandos deben encender la marca de PvP manualmente.' },
-  { title: '3. Construcción y Modificación del Terreno', text: 'No aplanar áreas masivas sin necesidad para evitar lag en el servidor. Respeta una distancia mínima de 100m con las bases de otros jugadores a menos que haya permiso expreso.' },
-  { title: '4. Cofres y Recursos compartidos', text: 'Los cofres marcados como "PÚBLICO" o "COMUNIDAD" son libres. No tomes recursos de bases privadas ajenas sin consentimiento.' },
-  { title: '5. Uso de Mods y Trampas', text: 'Está prohibido el uso de cheats mediante consola local (`devcommands`), duplicación de objetos o mods de vuelo en el servidor público. Únicamente están permitidos los mods de la lista oficial.' }
+  { icon: '👥', title: 'Respeto y convivencia', text: 'No se permiten insultos, acoso, discriminación, toxicidad ni faltas de respeto. El comportamiento hostil hacia otros jugadores puede conllevar sanciones.' },
+  { icon: '🔒', title: 'Propiedad y saqueo', text: 'Está prohibido robar objetos, recursos o pertenencias. No aproveches bases, trampas ni estructuras ajenas sin permiso; respeta el trabajo y el progreso de cada jugador.' },
+  { icon: '🏚️', title: 'Estructuras y construcción', text: 'No destruyas construcciones ajenas ni bloquees accesos, comerciantes o zonas importantes. Evita construcciones y alteraciones innecesarias del terreno que puedan perjudicar el rendimiento.' },
+  { icon: '💬', title: 'Comunicación', text: 'Usa el chat con educación. No hagas spam, publicidad no autorizada ni compartas enlaces sospechosos.' },
+  { icon: '⚔️', title: 'PvE y dificultad', text: 'Kasiheim es un servidor PvE: no ataques a otros jugadores. La dificultad general es Normal; los portales permiten transportar materiales que normalmente no pueden cruzarlos.' },
+  { icon: '🛡️', title: 'Mods y seguridad', text: 'Usa únicamente los mods autorizados para Kasiheim. No se permiten hacks, exploits, duplicación de objetos ni aprovechar bugs para obtener ventaja o perjudicar a alguien.' },
+  { icon: '🆘', title: 'Soporte y objetivo', text: 'Si encuentras un problema, bug o caída, avisa directamente a Kasiri o a la administración. Queremos mantener una comunidad sana, divertida y respetuosa donde todos puedan disfrutar.' }
 ];
 
-export const GALLERY = [
-  { title: 'Gran Salón del Clan Kasiheim', author: 'Kasiri_Jarl', url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop', tag: 'Bases' },
-  { title: 'Victoria contra la Masa de Huesos', author: 'Escuadrón Vikingo', url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop', tag: 'Jefes' },
-  { title: 'Expedición Nival en las Montañas', author: 'Valkyrie_Thor', url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop', tag: 'Aventura' },
-  { title: 'Puerto Drakkars de Valhalla', author: 'Lagertha_Build', url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1200&auto=format&fit=crop', tag: 'Bases' }
-];
+export const GALLERY = [];
 
 export const FAQ_COMMANDS = [
-  { cmd: '/s [mensaje]', desc: 'Envía un mensaje de texto normal visible para los jugadores cercanos.' },
-  { cmd: '/shout [mensaje]', desc: 'Grita un mensaje que se muestra en pantalla a todos los jugadores del mapa.' },
-  { cmd: '/w [mensaje]', desc: 'Susurra a los jugadores que estén pegados a ti.' },
-  { cmd: '/resetmap', desc: 'Reinicia la exploración de tu mapa personal si se buguea.' }
+  { cmd: 'playerlist', desc: 'Comando de administración de Server_devcommands. Entra al servidor, abre la consola con F5 y ejecútalo para ver los jugadores conectados. Requiere el mod en el cliente y permisos de administrador.' }
 ];
 
-export const R2MODMAN_CODE = '01a154f3-bd95-7467-882f-0154a0568cea';
+export const FAQ_ITEMS = [
+  { question: '¿Cómo me conecto al servidor?', answer: 'Usa «Unirse a Kasiheim» en esta página o añade kasiriserver.servegame.com:2458 desde la opción de unirse por IP de Valheim.' },
+  { question: '¿Qué dificultad tiene el mundo?', answer: 'La dificultad general es Normal. Los portales permiten transportar metales y otros materiales que normalmente no pueden cruzarlos.' },
+  { question: '¿Es un servidor PvP?', answer: 'No. Kasiheim es PvE; no ataques a otros jugadores. Consulta las normas completas antes de empezar.' },
+  { question: '¿Qué mods tengo que instalar?', answer: 'La lista muestra plugins detectados en el servidor y no significa que todos deban instalarse en el cliente. Sigue el perfil de r2modman o las instrucciones que publique la administración.' },
+  { question: '¿Dónde veo quién está conectado?', answer: 'El estado y los nombres disponibles aparecen en la página «Servidor» y se actualizan automáticamente.' },
+  { question: '¿Quién actualiza el progreso de jefes?', answer: 'El progreso por jugador y clan se muestra en «Jefes». La administración registra las derrotas.' },
+  { question: '¿Dónde aviso de un problema?', answer: 'Contacta directamente con Kasiri o con la administración de la comunidad.' }
+];
+
+export const SOCIAL_LINKS = [
+  { name: 'Twitch', url: 'https://www.twitch.tv/kasiri' },
+  { name: 'YouTube', url: 'https://www.youtube.com/@kasiri93' },
+  { name: 'TikTok', url: 'https://www.tiktok.com/@kasiri_93' },
+  { name: 'X', url: 'https://www.twitter.com/kasiri93/' },
+  { name: 'Instagram', url: 'https://www.instagram.com/kasiri93/' },
+  { name: 'Steam', url: 'https://steamcommunity.com/id/kasiri93/' }
+];

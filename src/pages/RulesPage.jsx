@@ -14,7 +14,10 @@ export default function RulesPage() {
       <div className="space-y-4">
         {RULES.map((rule) => (
           <article key={rule.title} className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-5 hover:border-amber-500/30 transition-all">
-            <h3 className="font-bold text-base text-amber-400 mb-2">{rule.title}</h3>
+            <h3 className="font-bold text-base text-amber-400 mb-2 flex items-center gap-2">
+              <span aria-hidden="true">{rule.icon}</span>
+              {rule.title}
+            </h3>
             <p className="text-sm text-slate-300 leading-relaxed">{rule.text}</p>
           </article>
         ))}

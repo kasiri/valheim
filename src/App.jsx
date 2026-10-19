@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   Crown,
   Download,
+  ExternalLink,
+  Heart,
   HelpCircle,
   Image as ImageIcon,
   ScrollText,
@@ -16,6 +18,7 @@ import ModsPage from './pages/ModsPage';
 import GalleryPage from './pages/GalleryPage';
 import FaqPage from './pages/FaqPage';
 import { api } from './lib/api';
+import { SOCIAL_LINKS } from './data/content';
 
 const SERVER_HOST = 'kasiriserver.servegame.com';
 const SERVER_PORT = 2458;
@@ -200,7 +203,38 @@ export default function App() {
 
         <main className="flex-1">{page}</main>
 
-        <footer className="mt-16 pt-6 border-t border-slate-800/80 text-center text-xs text-slate-500">
+        <section className="mt-16 rounded-2xl border border-amber-500/30 bg-slate-900/80 p-6 md:p-8 text-center shadow-xl shadow-amber-950/10">
+          <Heart className="mx-auto h-6 w-6 text-amber-400" aria-hidden="true" />
+          <h2 className="mt-3 text-lg font-bold text-slate-100">Ayuda a mantener viva la comunidad</h2>
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-400">
+            Suscríbete y comparte el canal de Kasiri para apoyar Kasiheim y ayudar a que el proyecto siga creciendo.
+          </p>
+          <a
+            href="https://www.youtube.com/@kasiri93?sub_confirmation=1"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-3 text-sm font-bold text-slate-950 transition-colors hover:bg-amber-400"
+          >
+            Suscribirme en YouTube
+            <ExternalLink className="h-4 w-4" aria-hidden="true" />
+          </a>
+          <nav aria-label="Redes de Kasiri" className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-3">
+            {SOCIAL_LINKS.map((social) => (
+              <a
+                key={social.name}
+                href={social.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs font-semibold text-slate-400 transition-colors hover:text-amber-300"
+              >
+                {social.name}
+                <span className="sr-only"> (se abre en una pestaña nueva)</span>
+              </a>
+            ))}
+          </nav>
+        </section>
+
+        <footer className="mt-8 border-t border-slate-800/80 pt-6 text-center text-xs text-slate-500">
           <p>Kasiheim Valheim Dedicated Server · Gestionado mediante AMP</p>
         </footer>
       </div>
