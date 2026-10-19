@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
-  Shield, 
   Users, 
   Server, 
   Swords, 
@@ -92,37 +91,51 @@ export default function App() {
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Intentar cargar el server_status.json generado por Python en la carpeta public
-  useEffect(() => {
-    fetch('./server_status.json')
-      .then(res => {
-        if (!res.ok) throw new Error('No se pudo cargar el estado');
-        return res.json();
-      })
-      .then(data => {
-        if (data) {
-          setIsOnline(true);
-          if (data.max_players) setMaxPlayers(data.max_players);
-          if (data.players && Array.isArray(data.players)) {
-            // Mapeamos los nombres devueltos por el script a objetos visuales
-            const formattedPlayers = data.players.map((name, idx) => ({
-              name: name,
-              role: idx === 0 ? 'Jarl (Admin)' : 'Guerrero Vikingo',
-              level: 50 + idx * 5,
-              timeOnline: '1h 20m',
-              ping: '20ms',
-              avatar: idx === 0 ? '🛡️' : '🪓',
-              biome: 'Exploración'
-            }));
-            setPlayers(formattedPlayers);
-          }
-        }
-      })
-      .catch(() => {
-        // Si no existe el JSON o falla, se queda con los datos demo iniciales tranquilamente
-        console.log("Usando datos de demostración para jugadores.");
-      });
+  const fetchStatus = useCallback(async () => {
+    try {
+      const res = await fetch('https://kasiheim.site/api/status');
+      if (!res.ok) throw new Error('No se pudo cargar el estado');
+
+      const data = await res.json();
+      if (!data) return;
+
+      setIsOnline(data.online ?? true);
+
+      if (typeof data.max_players === 'number') {
+        setMaxPlayers(data.max_players);
+      }
+
+      if (typeof data.version === 'string' && data.version.trim()) {
+        setServerVersion(data.version);
+      }
+
+      if (Array.isArray(data.players)) {
+        const formattedPlayers = data.players.map((name, idx) => ({
+          name: name,
+          role: idx === 0 ? 'Jarl (Admin)' : 'Guerrero Vikingo',
+          level: 50 + idx * 5,
+          timeOnline: '1h 20m',
+          ping: '20ms',
+          avatar: idx === 0 ? '🛡️' : '🪓',
+          biome: 'Exploración'
+        }));
+        setPlayers(formattedPlayers);
+      }
+    } catch (err) {
+      console.error('Error al obtener estado de la API:', err);
+      setIsOnline(false);
+    }
   }, []);
+
+  useEffect(() => {
+    const refresh = () => {
+      void fetchStatus();
+    };
+
+    refresh();
+    const interval = setInterval(refresh, 10000);
+    return () => clearInterval(interval);
+  }, [fetchStatus]);
 
   // Background Ping Simulation
   useEffect(() => {
@@ -146,9 +159,10 @@ export default function App() {
     setTimeout(() => setCopiedModCode(false), 2500);
   };
 
-  // Refresh server state simulation
+  // Refresh server state
   const handleRefreshServer = () => {
     setIsRefreshing(true);
+    fetchStatus();
     setTimeout(() => {
       setIsRefreshing(false);
     }, 800);
