@@ -36,7 +36,7 @@ VALHEIM_ROOT="/home/amp/.ampdata/instances/Kasiheimmods01/Valheim/896660"
 dotnet build backend/valheim-plugin/KasiheimPlayers.csproj -c Release \
   -p:ValheimManagedDir="$VALHEIM_ROOT/valheim_server_Data/Managed" \
   -p:BepInExCoreDir="$VALHEIM_ROOT/BepInEx/core"
-install -m 644 backend/valheim-plugin/bin/Release/netstandard2.0/KasiheimPlayers.dll \
+install -m 644 backend/valheim-plugin/bin/Release/netstandard2.1/KasiheimPlayers.dll \
   "$VALHEIM_ROOT/BepInEx/plugins/KasiheimPlayers.dll"
 ```
 
