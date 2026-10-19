@@ -246,7 +246,10 @@ def parse_valheim_cmdline(command_line: bytes, port: int = SERVER_PORT) -> dict 
 
 
 def _meaningful_server_value(value: str | None) -> str | None:
-    if not value or value.strip().casefold() in GENERIC_SERVER_VALUES:
+    if not value:
+        return None
+    normalized = value.strip().casefold()
+    if normalized in GENERIC_SERVER_VALUES or normalized.startswith("my valheim server - powered by"):
         return None
     return value.strip()
 

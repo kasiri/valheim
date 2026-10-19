@@ -82,6 +82,7 @@ class A2STests(unittest.TestCase):
             {"name": "My Valheim Server - Powered by AMP", "world": "PoweredByAMP"},
         )
         self.assertIsNone(api._meaningful_server_value("My Valheim Server - Powered by AMP"))
+        self.assertIsNone(api._meaningful_server_value("My Valheim Server - Powered by"))
         self.assertIsNone(api._meaningful_server_value("PoweredByAMP"))
         self.assertIsNone(api._meaningful_server_value("1.0.0.0"))
 
