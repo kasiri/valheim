@@ -12,8 +12,12 @@ dist
 dist-ssr
 *.local
 *.sqlite3
+server_players.json
+server_players.json.tmp
 __pycache__/
 *.py[cod]
+**/bin/
+**/obj/
 
 # Editor directories and files
 .vscode/*

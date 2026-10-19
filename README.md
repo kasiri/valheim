@@ -25,6 +25,23 @@ La API comprueba el proceso Valheim que utiliza `VALHEIM_PORT` y consulta el pro
 
 La configuración por defecto consulta el proceso del puerto `2458` y hace A2S en `127.0.0.1:2459`. Si AMP usa otro puerto de consulta, configura `VALHEIM_QUERY_PORT`. El estado se actualiza cada 10 segundos.
 
+### Nombres de jugadores con BepInEx
+
+Si A2S informa el número de jugadores pero no sus nombres, el complemento opcional `backend/valheim-plugin` escribe cada cinco segundos una instantánea local a `/home/amp/valheim-stats/server_players.json`. La API solo la acepta si tiene menos de 30 segundos y el número de nombres coincide con el contador A2S; si no, mantiene los nombres como no disponibles. El archivo contiene nombres visibles del juego y la API ya los publica, así que debe permanecer local al VPS.
+
+Compila desde una copia del repositorio en el VPS. Ajusta `VALHEIM_ROOT` si la carpeta de la instancia es diferente:
+
+```bash
+VALHEIM_ROOT="/home/amp/.ampdata/instances/Kasiheimmods01/Valheim/896660"
+dotnet build backend/valheim-plugin/KasiheimPlayers.csproj -c Release \
+  -p:ValheimManagedDir="$VALHEIM_ROOT/valheim_server_Data/Managed" \
+  -p:BepInExCoreDir="$VALHEIM_ROOT/BepInEx/core"
+install -m 644 backend/valheim-plugin/bin/Release/netstandard2.0/KasiheimPlayers.dll \
+  "$VALHEIM_ROOT/BepInEx/plugins/KasiheimPlayers.dll"
+```
+
+La cuenta que ejecuta el servidor debe poder escribir `/home/amp/valheim-stats/server_players.json`; la cuenta de Uvicorn debe poder leerlo. Si Uvicorn no corre como `amp`, configura `KASIHEIM_PLAYERS_FILE` en `api.env` con la ruta real del archivo. Reinicia solo la instancia Valheim del puerto `2458` desde AMP para cargar el complemento; la API puede permanecer activa. Comprueba que el JSON se actualiza al conectar y desconectar jugadores y que la API devuelve sus nombres.
+
 ## API y despliegue del backend
 
 El backend necesita Python 3.10 o posterior y los paquetes de `backend/requirements.txt`. En el VPS, coloca `backend/api.py` como `/home/amp/valheim-stats/api.py`; conserva el resto de archivos de la instalación existente.

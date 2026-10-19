@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import hmac
+import json
 import logging
 import os
 import secrets
@@ -23,6 +24,13 @@ SERVER_PORT = int(os.getenv("VALHEIM_PORT", "2458"))
 QUERY_PORT = int(os.getenv("VALHEIM_QUERY_PORT", str(SERVER_PORT + 1)))
 QUERY_HOST = os.getenv("VALHEIM_QUERY_HOST", "127.0.0.1")
 MAX_PLAYERS = int(os.getenv("VALHEIM_MAX_PLAYERS", "10"))
+PLAYER_SNAPSHOT_FILE = Path(
+    os.getenv(
+        "KASIHEIM_PLAYERS_FILE",
+        "/home/amp/valheim-stats/server_players.json",
+    )
+)
+PLAYER_SNAPSHOT_MAX_AGE_SECONDS = 30
 DATABASE_PATH = Path(os.getenv("KASIHEIM_DATABASE", str(Path(__file__).with_name("kasiheim.sqlite3"))))
 ADMIN_SESSION_SECONDS = 8 * 60 * 60
 PASSWORD_HASH_ITERATIONS = 310_000
@@ -229,6 +237,52 @@ def parse_a2s_player_names(packet: bytes) -> list[str]:
     return players
 
 
+def read_plugin_player_names(expected_count: int) -> list[str] | None:
+    try:
+        with PLAYER_SNAPSHOT_FILE.open("r", encoding="utf-8") as snapshot_file:
+            snapshot = json.load(snapshot_file)
+    except FileNotFoundError:
+        return None
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        logger.warning("No se pudo leer la lista de jugadores de BepInEx: %s", error)
+        return None
+
+    if not isinstance(snapshot, dict) or not isinstance(snapshot.get("updated_at"), str):
+        logger.warning("El archivo de jugadores de BepInEx tiene un formato no válido.")
+        return None
+    raw_players = snapshot.get("players")
+    if not isinstance(raw_players, list) or any(not isinstance(name, str) or not name.strip() for name in raw_players):
+        logger.warning("El archivo de jugadores de BepInEx contiene una lista no válida.")
+        return None
+
+    updated_at_text = snapshot["updated_at"]
+    if updated_at_text.endswith("Z"):
+        updated_at_text = updated_at_text[:-1] + "+00:00"
+    try:
+        updated_at = datetime.fromisoformat(updated_at_text)
+    except ValueError:
+        logger.warning("El archivo de jugadores de BepInEx tiene una fecha no válida.")
+        return None
+    if updated_at.tzinfo is None:
+        logger.warning("La fecha del archivo de jugadores de BepInEx no tiene zona horaria.")
+        return None
+
+    age_seconds = (datetime.now(timezone.utc) - updated_at.astimezone(timezone.utc)).total_seconds()
+    if age_seconds < -5 or age_seconds > PLAYER_SNAPSHOT_MAX_AGE_SECONDS:
+        logger.info("La lista de jugadores de BepInEx está obsoleta o tiene una fecha futura.")
+        return None
+
+    players = [name.strip() for name in raw_players]
+    if len(players) != expected_count:
+        logger.info(
+            "A2S_INFO informa %s jugadores, pero el complemento BepInEx informa %s nombres.",
+            expected_count,
+            len(players),
+        )
+        return None
+    return players
+
+
 def parse_valheim_cmdline(command_line: bytes, port: int = SERVER_PORT) -> dict | None:
     arguments = command_line.split(b"\0")
     if not arguments or not arguments[0]:
@@ -317,6 +371,8 @@ def get_server_status() -> dict:
                 )
         except (OSError, ValueError) as error:
             logger.info("No se pudo consultar la lista A2S_PLAYER: %s", error)
+        if result["players"] is None:
+            result["players"] = read_plugin_player_names(info["player_count"])
     return result
 
 

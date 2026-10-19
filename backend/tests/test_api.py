@@ -1,6 +1,8 @@
+import json
 import tempfile
 import unittest
 from contextlib import closing
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -90,6 +92,44 @@ class A2STests(unittest.TestCase):
         self.assertIsNone(api._meaningful_server_value("My Valheim Server - Powered by"))
         self.assertIsNone(api._meaningful_server_value("PoweredByAMP"))
         self.assertIsNone(api._meaningful_server_value("1.0.0.0"))
+
+
+class PlayerSnapshotTests(unittest.TestCase):
+    def test_reads_fresh_snapshot_with_matching_player_count(self):
+        with tempfile.TemporaryDirectory() as directory:
+            snapshot_path = Path(directory) / "players.json"
+            snapshot_path.write_text(
+                json.dumps(
+                    {
+                        "updated_at": datetime.now(timezone.utc).isoformat(),
+                        "players": [" Kasiri_Jarl "],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with patch.object(api, "PLAYER_SNAPSHOT_FILE", snapshot_path):
+                self.assertEqual(api.read_plugin_player_names(1), ["Kasiri_Jarl"])
+
+    def test_rejects_stale_or_mismatched_player_snapshots(self):
+        with tempfile.TemporaryDirectory() as directory:
+            snapshot_path = Path(directory) / "players.json"
+            stale_snapshot = {
+                "updated_at": (datetime.now(timezone.utc) - timedelta(seconds=60)).isoformat(),
+                "players": ["Kasiri_Jarl"],
+            }
+            snapshot_path.write_text(json.dumps(stale_snapshot), encoding="utf-8")
+
+            with patch.object(api, "PLAYER_SNAPSHOT_FILE", snapshot_path):
+                self.assertIsNone(api.read_plugin_player_names(1))
+
+            fresh_snapshot = {
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "players": ["Kasiri_Jarl"],
+            }
+            snapshot_path.write_text(json.dumps(fresh_snapshot), encoding="utf-8")
+            with patch.object(api, "PLAYER_SNAPSHOT_FILE", snapshot_path):
+                self.assertIsNone(api.read_plugin_player_names(2))
 
 
 class AdminAndStorageTests(unittest.TestCase):
@@ -255,6 +295,31 @@ class StatusTests(unittest.TestCase):
 
         self.assertEqual(result["player_count"], 1)
         self.assertIsNone(result["players"])
+
+    def test_status_uses_plugin_snapshot_when_a2s_names_are_empty(self):
+        with (
+            patch.object(api, "find_valheim_process", return_value={"world": "KasiheimWorld"}),
+            patch.object(
+                api,
+                "query_server_info",
+                return_value=(
+                    {
+                        "server_name": "Kasiheim",
+                        "map": "KasiheimWorld",
+                        "version": "0.219.16",
+                        "player_count": 1,
+                        "max_players": 10,
+                    },
+                    18.5,
+                ),
+            ),
+            patch.object(api, "query_player_names", return_value=[""]),
+            patch.object(api, "read_plugin_player_names", return_value=["Kasiri_Jarl"]),
+        ):
+            result = api.get_server_status()
+
+        self.assertEqual(result["player_count"], 1)
+        self.assertEqual(result["players"], ["Kasiri_Jarl"])
 
     def test_status_omits_amp_default_metadata(self):
         with (
