@@ -76,7 +76,11 @@ export default function DashboardPage({ status, statusError, isLoading }) {
         ) : !status ? (
           <p className="py-8 text-center text-sm text-slate-400">Estado del servidor no disponible.</p>
         ) : !Array.isArray(players) ? (
-          <p className="py-8 text-center text-sm text-slate-400">La API no puede obtener los nombres de los jugadores.</p>
+          <p className="py-8 text-center text-sm text-slate-400">
+            {Number.isFinite(playerCount) && playerCount > 0
+              ? `El servidor informa ${playerCount} ${playerCount === 1 ? 'jugador conectado' : 'jugadores conectados'}, pero no se pudo obtener ${playerCount === 1 ? 'su nombre' : 'sus nombres'}.`
+              : 'La API no puede obtener los nombres de los jugadores.'}
+          </p>
         ) : players.length === 0 ? (
           <p className="py-8 text-center text-sm text-slate-400">No hay jugadores conectados.</p>
         ) : (

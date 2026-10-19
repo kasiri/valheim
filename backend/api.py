@@ -224,7 +224,8 @@ def parse_a2s_player_names(packet: bytes) -> list[str]:
         if offset + 8 > len(packet):
             raise ValueError("Respuesta A2S_PLAYER truncada.")
         offset += 8
-        players.append(name)
+        if name.strip():
+            players.append(name.strip())
     return players
 
 
@@ -305,7 +306,7 @@ def get_server_status() -> dict:
         result["players"] = []
     else:
         try:
-            players = query_player_names()
+            players = [name.strip() for name in query_player_names() if name.strip()]
             if len(players) == info["player_count"]:
                 result["players"] = players
             else:

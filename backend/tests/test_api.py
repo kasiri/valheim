@@ -51,6 +51,11 @@ class A2STests(unittest.TestCase):
 
         self.assertEqual(api.parse_a2s_player_names(packet), ["Kasiri_Jarl", "Valkyrie_Thor"])
 
+    def test_parse_player_names_ignores_empty_names(self):
+        packet = b"\xff\xff\xff\xffD\x01" + b"\x00" + cstring("") + b"\x00" * 8
+
+        self.assertEqual(api.parse_a2s_player_names(packet), [])
+
     def test_reject_truncated_server_info(self):
         with self.assertRaises(ValueError):
             api.parse_a2s_info(b"\xff\xff\xff\xffI\x11")
@@ -226,6 +231,30 @@ class StatusTests(unittest.TestCase):
         self.assertEqual(result["ping_ms"], 31.4)
         self.assertEqual(result["version"], "0.219.16")
         self.assertEqual(result["players"], ["Kasiri_Jarl", "Valkyrie_Thor"])
+
+    def test_status_does_not_report_blank_names_as_connected_players(self):
+        with (
+            patch.object(api, "find_valheim_process", return_value={"world": "KasiheimWorld"}),
+            patch.object(
+                api,
+                "query_server_info",
+                return_value=(
+                    {
+                        "server_name": "Kasiheim",
+                        "map": "KasiheimWorld",
+                        "version": "0.219.16",
+                        "player_count": 1,
+                        "max_players": 10,
+                    },
+                    18.5,
+                ),
+            ),
+            patch.object(api, "query_player_names", return_value=[""]),
+        ):
+            result = api.get_server_status()
+
+        self.assertEqual(result["player_count"], 1)
+        self.assertIsNone(result["players"])
 
     def test_status_omits_amp_default_metadata(self):
         with (

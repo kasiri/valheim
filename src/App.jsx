@@ -45,12 +45,14 @@ function normalizeStatus(data) {
   if (!data || typeof data !== 'object' || typeof data.online !== 'boolean') {
     throw new Error('La API devolvió un estado no válido.');
   }
+  const playerCount = Number.isFinite(data.player_count) ? data.player_count : null;
+  const players = normalizePlayers(data.players);
   return {
     online: data.online,
     process_running: data.process_running === true,
-    player_count: Number.isFinite(data.player_count) ? data.player_count : null,
+    player_count: playerCount,
     max_players: Number.isFinite(data.max_players) ? data.max_players : null,
-    players: normalizePlayers(data.players),
+    players: playerCount > 0 && players?.length === 0 ? null : players,
     ping_ms: Number.isFinite(data.ping_ms) ? data.ping_ms : null,
     version: typeof data.version === 'string' ? data.version : null,
     world: typeof data.world === 'string' ? data.world : null,
