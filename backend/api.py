@@ -27,7 +27,7 @@ MAX_PLAYERS = int(os.getenv("VALHEIM_MAX_PLAYERS", "10"))
 PLAYER_SNAPSHOT_FILE = Path(
     os.getenv(
         "KASIHEIM_PLAYERS_FILE",
-        "/home/amp/valheim-stats/server_players.json",
+        "/home/amp/.ampdata/instances/Kasiheimmods01/Valheim/896660/BepInEx/config/kasiheim_players.json",
     )
 )
 PLAYER_SNAPSHOT_MAX_AGE_SECONDS = 30

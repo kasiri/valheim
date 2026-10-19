@@ -12,8 +12,8 @@ dist
 dist-ssr
 *.local
 *.sqlite3
-server_players.json
-server_players.json.tmp
+kasiheim_players.json
+kasiheim_players.json.tmp
 __pycache__/
 *.py[cod]
 **/bin/

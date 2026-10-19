@@ -20,7 +20,7 @@ public sealed class KasiheimPlayersPlugin : BaseUnityPlugin
         _outputFile = Config.Bind(
             "General",
             "OutputFile",
-            "/home/amp/valheim-stats/server_players.json",
+            "/home/amp/.ampdata/instances/Kasiheimmods01/Valheim/896660/BepInEx/config/kasiheim_players.json",
             "Local JSON file containing the current connected player names."
         );
         Logger.LogInfo($"Player snapshot output: {_outputFile.Value}");
