@@ -35,6 +35,11 @@ VALID_BOSS_IDS = {
     "la_reina",
     "fader",
 }
+GENERIC_SERVER_VALUES = {
+    "my valheim server - powered by amp",
+    "poweredbyamp",
+    "1.0.0.0",
+}
 
 
 def _open_database():
@@ -233,11 +238,17 @@ def parse_valheim_cmdline(command_line: bytes, port: int = SERVER_PORT) -> dict 
 
     options = {}
     for index, argument in enumerate(arguments[:-1]):
-        if argument in (b"-port", b"-world"):
+        if argument in (b"-port", b"-name", b"-world"):
             options[argument.decode("ascii")] = arguments[index + 1].decode("utf-8", errors="replace")
     if options.get("-port") == str(port):
-        return {"world": options.get("-world")}
+        return {"name": options.get("-name"), "world": options.get("-world")}
     return None
+
+
+def _meaningful_server_value(value: str | None) -> str | None:
+    if not value or value.strip().casefold() in GENERIC_SERVER_VALUES:
+        return None
+    return value.strip()
 
 
 def find_valheim_process(port: int = SERVER_PORT) -> dict | None:
@@ -260,8 +271,8 @@ def get_server_status() -> dict:
     result = {
         "online": False,
         "process_running": process is not None,
-        "server_name": None,
-        "world": process.get("world") if process else None,
+        "server_name": _meaningful_server_value(process.get("name")) if process else None,
+        "world": _meaningful_server_value(process.get("world")) if process else None,
         "version": None,
         "ping_ms": None,
         "max_players": MAX_PLAYERS,
@@ -280,9 +291,9 @@ def get_server_status() -> dict:
 
     result.update(
         online=True,
-        server_name=info["server_name"] or None,
-        world=process.get("world") or info["map"] or None,
-        version=info["version"] or None,
+        server_name=result["server_name"] or _meaningful_server_value(info["server_name"]),
+        world=result["world"] or _meaningful_server_value(info["map"]),
+        version=_meaningful_server_value(info["version"]),
         ping_ms=round(ping_ms, 1),
         max_players=info["max_players"] or MAX_PLAYERS,
         player_count=info["player_count"],

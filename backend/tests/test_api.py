@@ -66,7 +66,24 @@ class A2STests(unittest.TestCase):
         )
 
         self.assertIsNone(api.parse_valheim_cmdline(process_2456, 2458))
-        self.assertEqual(api.parse_valheim_cmdline(process_2458, 2458), {"world": "KasiheimWorld"})
+        self.assertEqual(
+            api.parse_valheim_cmdline(process_2458, 2458),
+            {"name": "Kasiheim", "world": "KasiheimWorld"},
+        )
+
+    def test_amp_default_metadata_is_not_treated_as_real_server_details(self):
+        process_2458 = (
+            b"/home/amp/Valheim/valheim_server.x86_64\0-name\0My Valheim Server - Powered by AMP\0-port\0"
+            + b"2458\0-world\0PoweredByAMP\0"
+        )
+
+        self.assertEqual(
+            api.parse_valheim_cmdline(process_2458, 2458),
+            {"name": "My Valheim Server - Powered by AMP", "world": "PoweredByAMP"},
+        )
+        self.assertIsNone(api._meaningful_server_value("My Valheim Server - Powered by AMP"))
+        self.assertIsNone(api._meaningful_server_value("PoweredByAMP"))
+        self.assertIsNone(api._meaningful_server_value("1.0.0.0"))
 
 
 class AdminAndStorageTests(unittest.TestCase):
@@ -208,6 +225,38 @@ class StatusTests(unittest.TestCase):
         self.assertEqual(result["ping_ms"], 31.4)
         self.assertEqual(result["version"], "0.219.16")
         self.assertEqual(result["players"], ["Kasiri_Jarl", "Valkyrie_Thor"])
+
+    def test_status_omits_amp_default_metadata(self):
+        with (
+            patch.object(
+                api,
+                "find_valheim_process",
+                return_value={"name": "My Valheim Server - Powered by AMP", "world": "PoweredByAMP"},
+            ),
+            patch.object(
+                api,
+                "query_server_info",
+                return_value=(
+                    {
+                        "server_name": "My Valheim Server - Powered by AMP",
+                        "map": "PoweredByAMP",
+                        "version": "1.0.0.0",
+                        "player_count": 0,
+                        "max_players": 10,
+                    },
+                    12.2,
+                ),
+            ),
+        ):
+            result = api.get_server_status()
+
+        self.assertTrue(result["online"])
+        self.assertTrue(result["process_running"])
+        self.assertIsNone(result["server_name"])
+        self.assertIsNone(result["world"])
+        self.assertIsNone(result["version"])
+        self.assertEqual(result["player_count"], 0)
+        self.assertEqual(result["players"], [])
 
 
 if __name__ == "__main__":
